@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">dpapp</string>
+    <string name="signup">signup</string>
+    <string name="signin">signin</string>
+    <string name="upload">upload</string>
+    <string name="download">download</string>
+</resources>
