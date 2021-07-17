@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class Types {
     public static class User {
-        private String user;
-        private String passwd;
+        private final String user;
+        private final String passwd;
 
         public User(String user, String passwd) {
             this.user = user;

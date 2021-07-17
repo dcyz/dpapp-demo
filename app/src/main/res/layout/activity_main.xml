@@ -15,28 +15,28 @@
             android:id="@+id/signupBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="signup"
+            android:onClick="onClickSignUp"
             android:text="@string/signup" />
 
         <Button
             android:id="@+id/signinBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="signin"
+            android:onClick="onClickSignIn"
             android:text="@string/signin" />
 
         <Button
             android:id="@+id/uploadBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="upload"
+            android:onClick="onClickUpload"
             android:text="@string/upload" />
 
         <Button
             android:id="@+id/downloadBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="download"
+            android:onClick="onClickDownload"
             android:text="@string/download" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

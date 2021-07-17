@@ -21,9 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 
-import https.GetRequest;
+import https.Requests;
 import https.OkhttpManager;
-import https.PostRequest;
 import https.Types;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -49,10 +48,11 @@ public class MainActivity extends AppCompatActivity {
         try {
             OkhttpManager.getInstance().setTrustrCertificates(getAssets().open("certificate"));
             OkHttpClient mOkhttpClient = OkhttpManager.getInstance().build();
+            // 实例化Retrofit对象
             retrofit = new Retrofit.Builder()
                     .client(mOkhttpClient)
                     .baseUrl("https://39.107.92.179/")
-                    // 使用Gson进行序列化
+                    // 使用Gson进行（反）序列化
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         } catch (IOException e) {
@@ -60,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 获取必要的权限
+     *
+     * @param context    上下文信息
+     * @param permission 申请的权限
+     */
     private void RequestPermissions(@NonNull Context context, @NonNull String permission) {
         if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
             Log.i("RequestPermissions", ": [ " + permission + " ]没有授权，申请权限");
@@ -69,14 +75,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void signup(View view) {
-
-    }
-
-    public void signin(View view) {
-        PostRequest postRequest = retrofit.create(PostRequest.class);
-        Types.User user = new Types.User("234", "234");
-        Call<Types.Result> resp = postRequest.signIn("signin", user, "");
+    public void signup(String user, String passwd) {
+        Requests.PostRequest postRequest = retrofit.create(Requests.PostRequest.class);
+        Call<Types.Result> resp = postRequest.signIn(new Types.User(user, passwd), "");
         resp.enqueue(new Callback<Types.Result>() {
             @Override
             public void onResponse(@NotNull Call<Types.Result> call, @NotNull Response<Types.Result> response) {
@@ -84,16 +85,41 @@ public class MainActivity extends AppCompatActivity {
                 int status = response.body().getStatus();
                 if (status != 0) {
                     String msg = response.body().getMsg();
-                    hinter("SIGNIN", msg);
+                    hinter("signup", msg);
                 } else {
                     token = (String) (response.body().getData().get("Token"));
-                    hinter("SIGNIN", "Token: " + token);
+                    hinter("signup", "Token: " + token);
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call<Types.Result> call, @NotNull Throwable t) {
-                hinter("SIGNIN", "Get Token Failed");
+                hinter("signup", "Get Token Failed");
+                t.printStackTrace();
+            }
+        });
+    }
+
+    public void signin(String user, String passwd) {
+        Requests.PostRequest postRequest = retrofit.create(Requests.PostRequest.class);
+        Call<Types.Result> resp = postRequest.signIn(new Types.User(user, passwd), "");
+        resp.enqueue(new Callback<Types.Result>() {
+            @Override
+            public void onResponse(@NotNull Call<Types.Result> call, @NotNull Response<Types.Result> response) {
+                assert response.body() != null;
+                int status = response.body().getStatus();
+                if (status != 0) {
+                    String msg = response.body().getMsg();
+                    hinter("signin", msg);
+                } else {
+                    token = (String) (response.body().getData().get("Token"));
+                    hinter("signin", "Token: " + token);
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<Types.Result> call, @NotNull Throwable t) {
+                hinter("signin", "Get Token Failed");
                 t.printStackTrace();
             }
         });
@@ -103,9 +129,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void download(View view) {
-        GetRequest getRequest = retrofit.create(GetRequest.class);
-        Call<ResponseBody> resp = getRequest.getResult("download", new HashMap<>(), "Bearer " + token);
+    public void download() {
+        Requests.GetRequest getRequest = retrofit.create(Requests.GetRequest.class);
+        Call<ResponseBody> resp = getRequest.download(new HashMap<>(), "Bearer " + token);
         resp.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
@@ -137,5 +163,20 @@ public class MainActivity extends AppCompatActivity {
     private void hinter(String tag, String msg) {
         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
         Log.d(tag, msg);
+    }
+
+    public void onClickSignUp(View view) {
+        signup("234", "234");
+    }
+
+    public void onClickSignIn(View view) {
+        signin("234", "234");
+    }
+
+    public void onClickUpload(View view) {
+    }
+
+    public void onClickDownload(View view) {
+        download();
     }
 }
