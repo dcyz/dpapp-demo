@@ -48,13 +48,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickSignIn(View view) {
-        Requests.signin("234", "234");
+        Requests.signin("2345", "2345");
     }
 
     public void onClickUpload(View view) {
     }
 
     public void onClickDownload(View view) {
-        Requests.download();
     }
 }

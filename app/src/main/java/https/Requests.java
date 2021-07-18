@@ -98,44 +98,6 @@ public class Requests {
         });
         return msg[0];
     }
-
-//    public static String upload() {
-//
-//    }
-
-    public static String download() {
-        GetRequest getRequest = retrofit.create(GetRequest.class);
-        Call<ResponseBody> resp = getRequest.download(new HashMap<>(), Requests.token);
-        final String[] msg = new String[1];
-        resp.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
-                String contentType = response.headers().get("Content-Type");
-                assert contentType != null;
-                if (contentType.contains("json")) {
-                    try {
-                        assert response.body() != null;
-                        Gson gson = new Gson();
-                        Result result = gson.fromJson(response.body().string(), Result.class);
-                        msg[0] = result.getMsg();
-                        Log.d("download", msg[0]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    msg[0] = response.message();
-                    Log.d("download", contentType);
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call<ResponseBody> call, @NotNull Throwable t) {
-                Log.d("download", "Get Token Failed");
-                t.printStackTrace();
-            }
-        });
-        return msg[0];
-    }
 }
 
 
