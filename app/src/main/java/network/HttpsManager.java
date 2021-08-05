@@ -9,7 +9,25 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpsManager {
-    public static Retrofit retrofit;
+    private static Retrofit retrofit;
+
+    private static String token;
+
+    public static void setToken(String token) {
+        HttpsManager.token = token;
+    }
+
+    public static String getToken() {
+        return token;
+    }
+
+    public static void setRetrofit(Retrofit retrofit) {
+        HttpsManager.retrofit = retrofit;
+    }
+
+    public static Retrofit getRetrofit() {
+        return retrofit;
+    }
 
     public static void setHttps(Context context) {
         try {

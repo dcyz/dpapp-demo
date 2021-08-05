@@ -1,4 +1,4 @@
-package services.interfaces;
+package services;
 
 import models.RspModel;
 import models.structs.User;
