@@ -8,26 +8,29 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import https.Requests;
+import network.HttpsManager;
+import services.Requests;
 
-public class MainActivity extends AppCompatActivity {
+public class WelcomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_welcome);
         // 请求网络权限
-        RequestPermissions(MainActivity.this, Manifest.permission.INTERNET);
-        RequestPermissions(MainActivity.this, Manifest.permission.ACCESS_WIFI_STATE);
+        RequestPermissions(WelcomeActivity.this, Manifest.permission.INTERNET);
+        RequestPermissions(WelcomeActivity.this, Manifest.permission.ACCESS_WIFI_STATE);
         // 设置Okhttp和Retrofit库允许自签名证书
-        Requests.setHttps(MainActivity.this);
+        HttpsManager.setHttps(WelcomeActivity.this);
     }
 
     /**
@@ -48,15 +51,13 @@ public class MainActivity extends AppCompatActivity {
     public void onClickSignUp(View view) {
         EditText editName = findViewById(R.id.editName);
         EditText editPasswd = findViewById(R.id.editPasswd);
-        String result = Requests.signup(editName.getText().toString(), editPasswd.getText().toString());
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+        Requests.signup(WelcomeActivity.this, editName.getText().toString(), editPasswd.getText().toString());
     }
 
     public void onClickSignIn(View view) {
         EditText editName = findViewById(R.id.editName);
         EditText editPasswd = findViewById(R.id.editPasswd);
-        String result = Requests.signin(editName.getText().toString(), editPasswd.getText().toString());
-        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+        Requests.signin(WelcomeActivity.this, editName.getText().toString(), editPasswd.getText().toString());
     }
 
     public void onClickUpload(View view) {

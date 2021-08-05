@@ -1,4 +1,4 @@
-package https;
+package services.interfaces;
 
 import java.util.Map;
 

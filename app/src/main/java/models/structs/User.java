@@ -1,8 +1,9 @@
-package gson;
+package models.structs;
 
 public class User {
-    private final String user;
-    private final String passwd;
+    private String Token;
+    private String user;
+    private String passwd;
 
     public User(String user, String passwd) {
         this.user = user;
@@ -15,5 +16,9 @@ public class User {
 
     public String getPasswd() {
         return passwd;
+    }
+
+    public String getToken() {
+        return Token;
     }
 }

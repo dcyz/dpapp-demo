@@ -1,11 +1,10 @@
-package https;
+package services.interfaces;
 
-import gson.Result;
-import gson.User;
+import models.RspModel;
+import models.structs.User;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.HTTP;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
 
 /**
@@ -17,7 +16,6 @@ public interface PostRequest {
      * 登录至服务器，body形式application/json
      *
      * @param body Types.User对象
-     * @param auth Token字符串
      * @return Types.Result的Call
      */
     @Headers({
@@ -25,16 +23,14 @@ public interface PostRequest {
             "User-Agent: dpapp"
     })
     @HTTP(method = "POST", path = "signin", hasBody = true)
-    Call<Result> signIn(
-            @Body User body,
-            @Header("Authorization") String auth
+    Call<RspModel<User>> signIn(
+            @Body User body
     );
 
     /**
      * 注册至服务器，body形式application/json
      *
      * @param body Types.User对象
-     * @param auth Token字符串
      * @return Types.Result的Call
      */
     @Headers({
@@ -42,8 +38,7 @@ public interface PostRequest {
             "User-Agent: dpapp"
     })
     @HTTP(method = "POST", path = "signup", hasBody = true)
-    Call<Result> signUp(
-            @Body User body,
-            @Header("Authorization") String auth
+    Call<RspModel<User>> signUp(
+            @Body User body
     );
 }
