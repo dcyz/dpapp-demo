@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import https.Requests;
 
@@ -44,11 +46,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickSignUp(View view) {
-        Requests.signup("2345", "2345");
+        EditText editName = findViewById(R.id.editName);
+        EditText editPasswd = findViewById(R.id.editPasswd);
+        String result = Requests.signup(editName.getText().toString(), editPasswd.getText().toString());
+        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
     }
 
     public void onClickSignIn(View view) {
-        Requests.signin("2345", "2345");
+        EditText editName = findViewById(R.id.editName);
+        EditText editPasswd = findViewById(R.id.editPasswd);
+        String result = Requests.signin(editName.getText().toString(), editPasswd.getText().toString());
+        Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
     }
 
     public void onClickUpload(View view) {

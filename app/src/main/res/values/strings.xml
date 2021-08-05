@@ -4,4 +4,11 @@
     <string name="signin">signin</string>
     <string name="upload">upload</string>
     <string name="download">download</string>
+    <string name="appName">DP-App</string>
+    <string name="textSignUp">注册</string>
+    <string name="textSignIn">登录</string>
+    <string name="textName">用户名</string>
+    <string name="editName">输入用户名</string>
+    <string name="textPasswd">密码</string>
+    <string name="editPasswd">输入密码</string>
 </resources>
