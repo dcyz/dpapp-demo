@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.Arrays;
+
 import models.RspModel;
 import models.structs.User;
 import network.HttpsManager;
@@ -25,34 +27,35 @@ import services.PostRequest;
 
 public class WelcomeActivity extends AppCompatActivity {
 
+    private final int REQUEST_PERMISSION_NETWORK = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         // 请求网络权限
-        RequestPermissions(WelcomeActivity.this, Manifest.permission.INTERNET);
-        RequestPermissions(WelcomeActivity.this, Manifest.permission.ACCESS_WIFI_STATE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(WelcomeActivity.this, new String[]{Manifest.permission.INTERNET, Manifest.permission.ACCESS_WIFI_STATE}, REQUEST_PERMISSION_NETWORK);
+        }
         // 设置Okhttp和Retrofit库允许自签名证书
         HttpsManager.setHttps(WelcomeActivity.this);
     }
 
-    /**
-     * 获取必要的权限
-     *
-     * @param context    上下文信息
-     * @param permission 申请的权限
-     */
-    private void RequestPermissions(@NonNull Context context, @NonNull String permission) {
-        if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("RequestPermissions", ": [ " + permission + " ]没有授权，申请权限");
-            ActivityCompat.requestPermissions((Activity) context, new String[]{permission}, 100);
-        } else {
-            Log.i("RequestPermissions", ": [ " + permission + " ]有权限");
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_NETWORK) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("onRequestPermissionResult", "成功申请权限：" + Arrays.toString(permissions));
+            } else {
+                Log.d("onRequestPermissionResult", "申请权限失败：" + Arrays.toString(permissions));
+                ActivityUtils.setDialog(WelcomeActivity.this, "出错啦 ~", "网络权限申请失败");
+            }
         }
     }
 
     /**
      * 注册按钮的监听事件
+     *
      * @param view ...
      */
     public void onClickSignUp(View view) {
@@ -66,7 +69,7 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             protected void success(String msg, User data) {
                 if (data != null) {
-                    setDialog("注册成功 =ω=", "");
+                    ActivityUtils.setDialog(WelcomeActivity.this, "注册成功 =ω=", "");
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
@@ -75,13 +78,13 @@ public class WelcomeActivity extends AppCompatActivity {
                     Log.d("signup", "Token: " + HttpsManager.getToken());
                 } else {
                     Log.d("signup", msg);
-                    setDialog("么得数据哇 QAQ", msg);
+                    ActivityUtils.setDialog(WelcomeActivity.this, "么得数据哇 QAQ", msg);
                 }
             }
 
             @Override
             protected void failed(int type, String msg) {
-                setDialog("似乎出了点问题 QAQ", msg);
+                ActivityUtils.setDialog(WelcomeActivity.this, "似乎出了点问题 QAQ", msg);
                 Log.d("signup", msg);
             }
         });
@@ -89,6 +92,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     /**
      * 登录按钮的监听事件
+     *
      * @param view ...
      */
     public void onClickSignIn(View view) {
@@ -102,7 +106,7 @@ public class WelcomeActivity extends AppCompatActivity {
             @Override
             protected void success(String msg, User data) {
                 if (data != null) {
-                    setDialog("登录成功 =ω=", "");
+                    ActivityUtils.setDialog(WelcomeActivity.this, "登录成功 =ω=", "");
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
@@ -111,28 +115,15 @@ public class WelcomeActivity extends AppCompatActivity {
                     Log.d("signin", "Token: " + HttpsManager.getToken());
                 } else {
                     Log.d("signin", msg);
-                    setDialog("么得数据哇 QAQ", msg);
+                    ActivityUtils.setDialog(WelcomeActivity.this, "么得数据哇 QAQ", msg);
                 }
             }
 
             @Override
             protected void failed(int type, String msg) {
-                setDialog("似乎出了点问题 QAQ", msg);
+                ActivityUtils.setDialog(WelcomeActivity.this, "似乎出了点问题 QAQ", msg);
                 Log.d("signin", msg);
             }
         });
-    }
-
-
-    /**
-     * 弹出对话框（AlertDialog）
-     * @param title 对话框标题
-     * @param msg   对话框内容
-     */
-    public void setDialog(String title, String msg) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(WelcomeActivity.this);
-        dialog.setTitle(title);
-        dialog.setMessage(msg);
-        dialog.show();
     }
 }
