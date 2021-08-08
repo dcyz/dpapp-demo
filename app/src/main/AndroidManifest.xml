@@ -11,19 +11,25 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_mine"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_mine_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Dpapp">
+        android:theme="@style/Theme.Dpapp"
+        android:allowBackup="true">
         <activity
             android:name=".FirstActivity"
             android:exported="true" />
-        <activity android:name=".WelcomeActivity">
+        <activity
+            android:name=".SignInActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

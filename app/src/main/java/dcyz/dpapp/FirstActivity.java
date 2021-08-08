@@ -1,5 +1,7 @@
 package dcyz.dpapp;
 
+import static dcyz.dpapp.ActivityUtils.REQUEST_PERMISSION_LOCATION;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -8,6 +10,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,12 +24,17 @@ import java.util.List;
 
 public class FirstActivity extends AppCompatActivity {
 
-    private final int REQUEST_PERMISSION_LOCATION = 200;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first);
+
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.CLOSE_SIGNIN");
+        sendBroadcast(intent);
+        intent.setAction("android.intent.action.CLOSE_WELCOME");
+        sendBroadcast(intent);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(FirstActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         }

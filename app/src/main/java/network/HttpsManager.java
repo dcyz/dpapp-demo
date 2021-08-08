@@ -9,8 +9,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpsManager {
-    private static Retrofit retrofit;
-
     private static String token;
 
     public static void setToken(String token) {
@@ -21,15 +19,8 @@ public class HttpsManager {
         return token;
     }
 
-    public static void setRetrofit(Retrofit retrofit) {
-        HttpsManager.retrofit = retrofit;
-    }
-
-    public static Retrofit getRetrofit() {
-        return retrofit;
-    }
-
-    public static void setHttps(Context context) {
+    public static Retrofit getRetrofit(Context context) {
+        Retrofit retrofit = null;
         try {
             OkhttpManager.getInstance().setTrustrCertificates(context.getAssets().open("certificate"));
             OkHttpClient mOkhttpClient = OkhttpManager.getInstance().build();
@@ -43,5 +34,6 @@ public class HttpsManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return retrofit;
     }
 }

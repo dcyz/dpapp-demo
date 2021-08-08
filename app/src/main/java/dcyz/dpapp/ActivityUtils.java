@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 
 public class ActivityUtils {
+    public static final int REQUEST_PERMISSION_NETWORK = 100;
+    public static final int REQUEST_PERMISSION_LOCATION = 200;
+
     /**
      * 弹出对话框（AlertDialog）
      *
