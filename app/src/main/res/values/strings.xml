@@ -11,4 +11,5 @@
     <string name="editName">输入用户名</string>
     <string name="textPasswd">密码</string>
     <string name="editPasswd">输入密码</string>
+    <string name="app_description">DP-App\n位置隐私保护程序</string>
 </resources>
