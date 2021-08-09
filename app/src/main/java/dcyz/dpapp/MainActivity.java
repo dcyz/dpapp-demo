@@ -5,11 +5,8 @@ import static dcyz.dpapp.ActivityUtils.REQUEST_PERMISSION_LOCATION;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -22,12 +19,12 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.List;
 
-public class FirstActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_main);
 
         Intent intent = new Intent();
         intent.setAction("android.intent.action.CLOSE_SIGNIN");
@@ -36,7 +33,7 @@ public class FirstActivity extends AppCompatActivity {
         sendBroadcast(intent);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(FirstActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         }
     }
 
@@ -47,7 +44,7 @@ public class FirstActivity extends AppCompatActivity {
                 Log.d("onRequestPermissionResult", "成功申请权限：" + Arrays.toString(permissions));
             } else {
                 Log.d("onRequestPermissionResult", "申请权限失败：" + Arrays.toString(permissions));
-                ActivityUtils.setDialog(FirstActivity.this, "出错啦 ~", "网络权限申请失败");
+                ActivityUtils.setDialog(MainActivity.this, "出错啦 ~", "网络权限申请失败");
             }
         }
     }
@@ -55,12 +52,12 @@ public class FirstActivity extends AppCompatActivity {
     public void onClickUpload(View view) {
         Log.d("Upload", "开始上传");
         Location location = getLastKnownLocation();
-        Toast.makeText(FirstActivity.this, location.getLongitude() + ", " + location.getLatitude(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, location.getLongitude() + ", " + location.getLatitude(), Toast.LENGTH_SHORT).show();
     }
 
     private Location getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(FirstActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
         }
         LocationManager mLocationManager;
         mLocationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);

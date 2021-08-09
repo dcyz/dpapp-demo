@@ -1,7 +1,6 @@
 package dcyz.dpapp;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -108,7 +107,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         // 设置token
                         HttpsManager.setToken("Bearer " + data.getToken());
                         // 获取token后跳转到下一个Activity
-                        startActivity(new Intent(WelcomeActivity.this, FirstActivity.class));
+                        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
                         Log.d("WelcomeActivity", "Token: " + HttpsManager.getToken());
                     } else {
                         startActivity(new Intent(WelcomeActivity.this, SignInActivity.class));

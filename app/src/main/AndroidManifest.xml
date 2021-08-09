@@ -15,16 +15,14 @@
         android:theme="@style/Theme.Dpapp"
         android:allowBackup="true">
         <activity
-            android:name=".FirstActivity"
+            android:name=".MainActivity"
             android:exported="true" />
         <activity
             android:name=".SignInActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:exported="true" />
         <activity
             android:name=".WelcomeActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -107,7 +107,7 @@ public class SignInActivity extends AppCompatActivity {
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
-                    Intent intent = new Intent(SignInActivity.this, FirstActivity.class);
+                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                     startActivity(intent);
                     ActivityUtils.setDialog(SignInActivity.this, "注册成功 =ω=", "");
                     Log.d("signup", "Token: " + HttpsManager.getToken());
@@ -150,7 +150,7 @@ public class SignInActivity extends AppCompatActivity {
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
-                    Intent intent = new Intent(SignInActivity.this, FirstActivity.class);
+                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                     startActivity(intent);
                     ActivityUtils.setDialog(SignInActivity.this, "登录成功 =ω=", "");
                     Log.d("signin", "Token: " + HttpsManager.getToken());
