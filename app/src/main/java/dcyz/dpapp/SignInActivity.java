@@ -1,24 +1,18 @@
 package dcyz.dpapp;
 
-import static dcyz.dpapp.ActivityUtils.REQUEST_PERMISSION_NETWORK;
+import static dcyz.dpapp.ActivityUtils.setDialog;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-
-import java.util.Arrays;
 
 import models.RspModel;
 import models.structs.User;
@@ -38,14 +32,11 @@ public class SignInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
 
+        // 发送广播，关闭WelcomeActivity
         Intent intent = new Intent();
         intent.setAction("android.intent.action.CLOSE_WELCOME");
         sendBroadcast(intent);
 
-        // 请求网络权限
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(SignInActivity.this, new String[]{Manifest.permission.INTERNET, Manifest.permission.ACCESS_WIFI_STATE}, REQUEST_PERMISSION_NETWORK);
-        }
         // 设置Okhttp和Retrofit库允许自签名证书
         retrofit = HttpsManager.getRetrofit(SignInActivity.this);
 
@@ -53,10 +44,16 @@ public class SignInActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.CLOSE_SIGNIN");
         registerReceiver(receiver, filter);
+
+        // 自动填充用户名和密码
+        SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+        String user = sharedPreferences.getString("user", "");
+        String passwd = sharedPreferences.getString("passwd", "");
+        ((EditText) findViewById(R.id.editName)).setText(user);
+        ((EditText) findViewById(R.id.editPasswd)).setText(passwd);
     }
 
     private class MyReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             finish();
@@ -70,18 +67,6 @@ public class SignInActivity extends AppCompatActivity {
         unregisterReceiver(receiver);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSION_NETWORK) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("onRequestPermissionResult", "成功申请权限：" + Arrays.toString(permissions));
-            } else {
-                Log.d("onRequestPermissionResult", "申请权限失败：" + Arrays.toString(permissions));
-                ActivityUtils.setDialog(SignInActivity.this, "出错啦 ~", "网络权限申请失败");
-            }
-        }
-    }
-
     /**
      * 注册按钮的监听事件
      *
@@ -91,6 +76,10 @@ public class SignInActivity extends AppCompatActivity {
         EditText editName = findViewById(R.id.editName);
         EditText editPasswd = findViewById(R.id.editPasswd);
         String user = editName.getText().toString(), passwd = editPasswd.getText().toString();
+        if (user.equals("") || passwd.equals("")) {
+            setDialog(SignInActivity.this, "出错啦 QAQ", "用户名和密码不能为空");
+            return;
+        }
         // 通过Retrofit构建请求
         PostRequest postRequest = retrofit.create(PostRequest.class);
         Call<RspModel<User>> resp = postRequest.signUp(new User(user, passwd));
@@ -98,16 +87,19 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             protected void success(String msg, User data) {
                 if (data != null) {
+                    // TODO user和passwd均以明文形式存放，可以考虑加密后存储
                     // 将user和passwd写入sharedPreferences
                     SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user", user);
                     editor.putString("passwd", passwd);
+                    editor.putBoolean("status", true);
                     editor.apply();
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    intent.putExtra("user", user);
                     startActivity(intent);
                     ActivityUtils.setDialog(SignInActivity.this, "注册成功 =ω=", "");
                     Log.d("signup", "Token: " + HttpsManager.getToken());
@@ -134,6 +126,10 @@ public class SignInActivity extends AppCompatActivity {
         EditText editName = findViewById(R.id.editName);
         EditText editPasswd = findViewById(R.id.editPasswd);
         String user = editName.getText().toString(), passwd = editPasswd.getText().toString();
+        if (user.equals("") || passwd.equals("")) {
+            setDialog(SignInActivity.this, "出错啦 QAQ", "用户名和密码不能为空");
+            return;
+        }
         // 通过Retrofit构建请求
         PostRequest postRequest = retrofit.create(PostRequest.class);
         Call<RspModel<User>> resp = postRequest.signIn(new User(user, passwd));
@@ -141,16 +137,19 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             protected void success(String msg, User data) {
                 if (data != null) {
+                    // TODO user和passwd均以明文形式存放，可以考虑加密后存储
                     // 将user和passwd写入sharedPreferences
                     SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user", user);
                     editor.putString("passwd", passwd);
+                    editor.putBoolean("status", true);
                     editor.apply();
                     // 设置token
                     HttpsManager.setToken("Bearer " + data.getToken());
                     // 获取token后跳转到下一个Activity
                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                    intent.putExtra("user", user);
                     startActivity(intent);
                     ActivityUtils.setDialog(SignInActivity.this, "登录成功 =ω=", "");
                     Log.d("signin", "Token: " + HttpsManager.getToken());

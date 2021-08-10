@@ -1,7 +1,8 @@
 package dcyz.dpapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -83,11 +85,12 @@ public class WelcomeActivity extends AppCompatActivity {
     private void autoSignIn() {
         // 从sharedPreferences中获取user和passwd
         SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+        boolean status = sharedPreferences.getBoolean("status", false);
         String user = sharedPreferences.getString("user", "");
         String passwd = sharedPreferences.getString("passwd", "");
 
         // 如果sharedPreferences中没有存储user和passwd，则跳转到SignInActivity
-        if (user.equals("") || passwd.equals("")) {
+        if (!status) {
             Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
             startActivity(intent);
         } else {
@@ -98,16 +101,19 @@ public class WelcomeActivity extends AppCompatActivity {
                 @Override
                 protected void success(String msg, User data) {
                     if (data != null) {
-                        // 将user和passwd写入sharedPreferences
+                        // 将user、passwd和status写入sharedPreferences
                         SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("user", user);
                         editor.putString("passwd", passwd);
+                        editor.putBoolean("status", true);
                         editor.apply();
                         // 设置token
                         HttpsManager.setToken("Bearer " + data.getToken());
                         // 获取token后跳转到下一个Activity
-                        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+                        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+                        intent.putExtra("user", user);
+                        startActivity(intent);
                         Log.d("WelcomeActivity", "Token: " + HttpsManager.getToken());
                     } else {
                         startActivity(new Intent(WelcomeActivity.this, SignInActivity.class));

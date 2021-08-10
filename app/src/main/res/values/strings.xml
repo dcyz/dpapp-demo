@@ -12,4 +12,9 @@
     <string name="textPasswd">密码</string>
     <string name="editPasswd">输入密码</string>
     <string name="app_description">DP-App\n位置隐私保护程序</string>
+    <string name="nav_setting">设置</string>
+    <string name="nav_signout">退出登录</string>
+    <string name="nav_home">主页</string>
+    <string name="DefaultUser">User</string>
+    <string name="DefaultUserDesc">在线</string>
 </resources>
