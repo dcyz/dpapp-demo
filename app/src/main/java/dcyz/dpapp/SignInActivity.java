@@ -1,5 +1,6 @@
 package dcyz.dpapp;
 
+import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
 import static dcyz.dpapp.ActivityUtils.setDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,7 +47,7 @@ public class SignInActivity extends AppCompatActivity {
         registerReceiver(receiver, filter);
 
         // 自动填充用户名和密码
-        SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getEncryptedSharedPreferences(SignInActivity.this);
         String user = sharedPreferences.getString("user", "");
         String passwd = sharedPreferences.getString("passwd", "");
         ((EditText) findViewById(R.id.editName)).setText(user);
@@ -89,7 +90,7 @@ public class SignInActivity extends AppCompatActivity {
                 if (data != null) {
                     // TODO user和passwd均以明文形式存放，可以考虑加密后存储
                     // 将user和passwd写入sharedPreferences
-                    SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = getEncryptedSharedPreferences(SignInActivity.this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user", user);
                     editor.putString("passwd", passwd);
@@ -139,7 +140,7 @@ public class SignInActivity extends AppCompatActivity {
                 if (data != null) {
                     // TODO user和passwd均以明文形式存放，可以考虑加密后存储
                     // 将user和passwd写入sharedPreferences
-                    SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+                    SharedPreferences sharedPreferences = getEncryptedSharedPreferences(SignInActivity.this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user", user);
                     editor.putString("passwd", passwd);

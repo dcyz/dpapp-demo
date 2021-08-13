@@ -1,5 +1,7 @@
 package dcyz.dpapp;
 
+import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickSignOut(MenuItem menuItem) {
-        SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getEncryptedSharedPreferences(MainActivity.this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("status", false);
         editor.apply();

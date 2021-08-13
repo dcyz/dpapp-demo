@@ -2,6 +2,15 @@ package dcyz.dpapp;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
 
 public class ActivityUtils {
 
@@ -18,26 +27,22 @@ public class ActivityUtils {
         dialog.show();
     }
 
-    /*
-    public static Location getLastKnownLocation(Context context) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSION_LOCATION);
+    public static SharedPreferences getEncryptedSharedPreferences(Context context) {
+        SharedPreferences sharedPreferences = null;
+        try {
+            MasterKey.Builder builder = new MasterKey.Builder(context);
+            MasterKey masterKey = builder.setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build();
+            sharedPreferences = EncryptedSharedPreferences.create(
+                    context,
+                    "dp-app",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
         }
-        LocationManager mLocationManager;
-        mLocationManager = (LocationManager) context.getApplicationContext().getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers) {
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
-        }
-        return bestLocation;
+        return sharedPreferences;
     }
-    */
+
 }

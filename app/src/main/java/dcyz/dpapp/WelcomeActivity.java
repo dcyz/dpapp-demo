@@ -1,8 +1,12 @@
 package dcyz.dpapp;
 
+import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.annotation.NonNull;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -84,7 +88,7 @@ public class WelcomeActivity extends AppCompatActivity {
      */
     private void autoSignIn() {
         // 从sharedPreferences中获取user和passwd
-        SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getEncryptedSharedPreferences(WelcomeActivity.this);
         boolean status = sharedPreferences.getBoolean("status", false);
         String user = sharedPreferences.getString("user", "");
         String passwd = sharedPreferences.getString("passwd", "");
