@@ -5,12 +5,8 @@ import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.annotation.NonNull;
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKey;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -21,19 +17,19 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import models.RspModel;
-import models.structs.User;
+import models.structs.RespStatus;
 import network.HttpsManager;
 import network.MyCallback;
 import retrofit2.Call;
 import retrofit2.Retrofit;
-import services.PostRequest;
+import services.GetRequest;
 
 public class WelcomeActivity extends AppCompatActivity {
 
-    private MyReceiver receiver;
-    private Retrofit retrofit;
+    private ActivityUtils.MyReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,25 +40,17 @@ public class WelcomeActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_welcome);
 
+        HttpsManager.retrofitInitialize(WelcomeActivity.this);
+
         // 延时2秒跳转下一个activity
         handler.sendEmptyMessageDelayed(0, 2000);
 
         // 接收器，在跳转到下一个activity后接受广播信息，关闭此activity
-        receiver = new MyReceiver();
+        receiver = new ActivityUtils.MyReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.CLOSE_WELCOME");
+        filter.addAction("android.intent.action.CLOSE_ALL");
         registerReceiver(receiver, filter);
-
-        // 设置Okhttp和Retrofit库允许自签名证书
-        retrofit = HttpsManager.getRetrofit(WelcomeActivity.this);
-    }
-
-    // 内部类，广播信息的接收器
-    private class MyReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
     }
 
     @Override
@@ -78,59 +66,41 @@ public class WelcomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            autoSignIn();
+
+            SharedPreferences sharedPreferences = getEncryptedSharedPreferences(WelcomeActivity.this);
+            HttpsManager.setAccessToken(sharedPreferences.getString("AccessToken", ""));
+            HttpsManager.setRefreshToken(sharedPreferences.getString("RefreshToken", ""));
+            getNewToken();
+
+            //获取token后跳转到下一个Activity
+            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+            intent.putExtra("user", sharedPreferences.getString("user", ""));
+            startActivity(intent);
         }
     };
 
-    /**
-     * 自动登录
-     * 如果sharedPreferences中存储了user和passwd，则自动登录获取token
-     */
-    private void autoSignIn() {
-        // 从sharedPreferences中获取user和passwd
-        SharedPreferences sharedPreferences = getEncryptedSharedPreferences(WelcomeActivity.this);
-        boolean status = sharedPreferences.getBoolean("status", false);
-        String user = sharedPreferences.getString("user", "");
-        String passwd = sharedPreferences.getString("passwd", "");
-
-        // 如果sharedPreferences中没有存储user和passwd，则跳转到SignInActivity
-        if (!status) {
-            Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
-            startActivity(intent);
-        } else {
-            // 如果有user和passwd则尝试自动登录
-            PostRequest postRequest = retrofit.create(PostRequest.class);
-            Call<RspModel<User>> resp = postRequest.signIn(new User(user, passwd));
-            resp.enqueue(new MyCallback<User>() {
-                @Override
-                protected void success(String msg, User data) {
-                    if (data != null) {
-                        // 将user、passwd和status写入sharedPreferences
-                        SharedPreferences sharedPreferences = getSharedPreferences("dp-app", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("user", user);
-                        editor.putString("passwd", passwd);
-                        editor.putBoolean("status", true);
-                        editor.apply();
-                        // 设置token
-                        HttpsManager.setToken("Bearer " + data.getToken());
-                        // 获取token后跳转到下一个Activity
-                        Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-                        intent.putExtra("user", user);
-                        startActivity(intent);
-                        Log.d("WelcomeActivity", "Token: " + HttpsManager.getToken());
-                    } else {
-                        startActivity(new Intent(WelcomeActivity.this, SignInActivity.class));
-                        Log.d("WelcomeActivity", msg);
-                    }
+    private void getNewToken() {
+        GetRequest getRequest = HttpsManager.getRetrofit().create(GetRequest.class);
+        Call<RspModel<String>> resp = getRequest.refresh(HttpsManager.getRefreshToken());
+        resp.enqueue(new MyCallback<String>() {
+            @Override
+            protected void success(RespStatus innerRespStatus, String token) {
+                if (token != null) {
+                    HttpsManager.setAccessToken("Bearer " + token);
+                    Log.d("getNewToken-1", "AccessToken: " + HttpsManager.getAccessToken());
+                } else {
+                    Log.d("getNewToken-2", innerRespStatus.getMsg());
                 }
+            }
 
-                @Override
-                protected void failed(int type, String msg) {
-                    startActivity(new Intent(WelcomeActivity.this, SignInActivity.class));
-                    Log.d("WelcomeActivity", msg);
+            @Override
+            protected void failed(RespStatus respStatus, Call<RspModel<String>> call) {
+                if (respStatus.getCode() == 401 && respStatus.getStatus() == 2) {
+                    Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
+                    startActivity(intent);
                 }
-            });
-        }
+                Log.d("getNewToken-3", respStatus.getMsg());
+            }
+        });
     }
 }

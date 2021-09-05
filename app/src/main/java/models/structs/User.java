@@ -1,7 +1,6 @@
 package models.structs;
 
 public class User {
-    private String Token;
     private String user;
     private String passwd;
 
@@ -16,9 +15,5 @@ public class User {
 
     public String getPasswd() {
         return passwd;
-    }
-
-    public String getToken() {
-        return Token;
     }
 }

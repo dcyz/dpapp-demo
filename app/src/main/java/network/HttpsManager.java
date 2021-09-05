@@ -3,27 +3,44 @@ package network;
 import android.content.Context;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.util.Scanner;
 
 import okhttp3.OkHttpClient;
+import okhttp3.tls.Certificates;
+import okhttp3.tls.HandshakeCertificates;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HttpsManager {
-    private static String token;
+    private static String accessToken;
+    private static String refreshToken;
+    private static Retrofit retrofit;
 
-    public static void setToken(String token) {
-        HttpsManager.token = token;
+    public static String getRefreshToken() {
+        return refreshToken;
     }
 
-    public static String getToken() {
-        return token;
+    public static String getAccessToken() {
+        return accessToken;
     }
 
-    public static Retrofit getRetrofit(Context context) {
-        Retrofit retrofit = null;
+    public static void setAccessToken(String accessToken) {
+        HttpsManager.accessToken = accessToken;
+    }
+
+    public static void setRefreshToken(String refreshToken) {
+        HttpsManager.refreshToken = refreshToken;
+    }
+
+    public static Retrofit getRetrofit() {
+        return retrofit;
+    }
+
+    public static void retrofitInitialize(Context context) {
         try {
-            OkhttpManager.getInstance().setTrustrCertificates(context.getAssets().open("certificate"));
-            OkHttpClient mOkhttpClient = OkhttpManager.getInstance().build();
+            OkHttpClient mOkhttpClient = getOkhttpManager(context);
             // 实例化Retrofit对象
             retrofit = new Retrofit.Builder()
                     .client(mOkhttpClient)
@@ -34,6 +51,18 @@ public class HttpsManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return retrofit;
+    }
+
+    private static OkHttpClient getOkhttpManager(Context context) throws IOException {
+        InputStream inputStream = context.getAssets().open("certificate");
+        Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+        String result = s.hasNext() ? s.next() : "";
+        X509Certificate certificate = Certificates.decodeCertificatePem(result);
+        HandshakeCertificates certificates = new HandshakeCertificates.Builder()
+                .addTrustedCertificate(certificate)
+                .build();
+        return new OkHttpClient.Builder()
+                .sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager())
+                .build();
     }
 }

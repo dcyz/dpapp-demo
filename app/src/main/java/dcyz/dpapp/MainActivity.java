@@ -3,6 +3,7 @@ package dcyz.dpapp;
 import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
+    private ActivityUtils.MyReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent2 = new Intent();
         intent2.setAction("android.intent.action.CLOSE_WELCOME");
         sendBroadcast(intent2);
+
+        // 接收器，在跳转到下一个activity后接受广播信息，关闭此activity
+        receiver = new ActivityUtils.MyReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.intent.action.CLOSE_MAIN");
+        filter.addAction("android.intent.action.CLOSE_ALL");
+        registerReceiver(receiver, filter);
 
         // 设置DrawerLayout及其toolbar，使导航按钮能够监听点击动作并展开滑动窗口
         mDrawerLayout = (DrawerLayout) findViewById(R.id.activity_main);
