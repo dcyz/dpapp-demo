@@ -1,6 +1,7 @@
 package dcyz.dpapp;
 
 import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
+import static dcyz.dpapp.ActivityUtils.setTokenHandler;
 
 import androidx.appcompat.app.AppCompatActivity;
 

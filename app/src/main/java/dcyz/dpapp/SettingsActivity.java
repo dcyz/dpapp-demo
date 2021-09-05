@@ -1,5 +1,7 @@
 package dcyz.dpapp;
 
+import static dcyz.dpapp.ActivityUtils.setTokenHandler;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.IntentFilter;
@@ -10,7 +12,6 @@ import android.widget.Toast;
 
 import models.RspModel;
 import models.structs.RespStatus;
-import network.Errors;
 import network.HttpsManager;
 import network.MyCallback;
 import retrofit2.Call;
@@ -31,6 +32,8 @@ public class SettingsActivity extends AppCompatActivity {
         filter.addAction("android.intent.action.CLOSE_SETTINGS");
         filter.addAction("android.intent.action.CLOSE_ALL");
         registerReceiver(receiver, filter);
+
+        setTokenHandler(SettingsActivity.this);
     }
 
     public void onUpload(View view) {
@@ -51,12 +54,6 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             protected void failed(RespStatus respStatus, Call<RspModel<String>> call) {
                 Log.d("upload", "[ " + respStatus.getCode() + " | " + respStatus.getStatus() + " ]" + respStatus.getMsg());
-                Errors.responseErrorCheck(SettingsActivity.this, respStatus);
-                if (respStatus.getCode() == 401 && respStatus.getStatus() == 1) {
-                    PostRequest postRequest = HttpsManager.getRetrofit().create(PostRequest.class);
-                    Call<RspModel<String>> resp = postRequest.upload("Kacsas", HttpsManager.getAccessToken());
-                    resp.enqueue(this);
-                }
             }
         });
     }

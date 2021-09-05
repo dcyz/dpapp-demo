@@ -6,16 +6,60 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
+
+import models.RspModel;
+import models.structs.RespStatus;
+import network.HttpsManager;
+import network.MyCallback;
+import retrofit2.Call;
+import services.GetRequest;
 
 public class ActivityUtils {
+
+    private static Handler tokenHandler;
+
+    public static void setTokenHandler(Context context) {
+        tokenHandler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Runnable runnable1 = this;
+                GetRequest getRequest = HttpsManager.getRetrofit().create(GetRequest.class);
+                Call<RspModel<String>> resp = getRequest.refresh(HttpsManager.getRefreshToken());
+                resp.enqueue(new MyCallback<String>() {
+                    @Override
+                    protected void success(RespStatus respStatus, String token) {
+                        if (token != null) {
+                            HttpsManager.setAccessToken("Bearer " + token);
+                            Log.d("setTokenHandler-1", "AccessToken: " + HttpsManager.getAccessToken());
+                            Toast.makeText(context, "Token Refresh Successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("setTokenHandler-2", respStatus.getMsg());
+                        }
+                    }
+
+                    @Override
+                    protected void failed(RespStatus respStatus, Call<RspModel<String>> call) {
+                        Intent intent = new Intent(context, SignInActivity.class);
+                        context.startActivity(intent);
+                        tokenHandler.removeCallbacks(runnable1);
+                        Log.d("setTokenHandler-3", respStatus.getMsg());
+                    }
+                });
+                tokenHandler.postDelayed(this, 1000 * 60);
+            }
+        };
+        tokenHandler.post(runnable);
+    }
 
     /**
      * 弹出对话框（AlertDialog）
