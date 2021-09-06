@@ -41,7 +41,6 @@ public class ActivityUtils {
                         if (token != null) {
                             HttpsManager.setAccessToken("Bearer " + token);
                             Log.d("setTokenHandler-1", "AccessToken: " + HttpsManager.getAccessToken());
-                            Toast.makeText(context, "Token Refresh Successfully", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d("setTokenHandler-2", respStatus.getMsg());
                         }

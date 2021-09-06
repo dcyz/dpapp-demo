@@ -45,7 +45,8 @@
             android:layout_marginHorizontal="15dp"
             android:ems="10"
             android:hint="@string/editName"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textColor="#C3000000" />
     </LinearLayout>
 
     <LinearLayout
@@ -73,7 +74,8 @@
             android:layout_marginHorizontal="15dp"
             android:ems="10"
             android:hint="@string/editPasswd"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="#C3000000" />
 
     </LinearLayout>
 

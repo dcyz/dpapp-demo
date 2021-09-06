@@ -67,20 +67,15 @@ public class WelcomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-
-            SharedPreferences sharedPreferences = getEncryptedSharedPreferences(WelcomeActivity.this);
-            HttpsManager.setAccessToken(sharedPreferences.getString("AccessToken", ""));
-            HttpsManager.setRefreshToken(sharedPreferences.getString("RefreshToken", ""));
             getNewToken();
-
-            //获取token后跳转到下一个Activity
-            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-            intent.putExtra("user", sharedPreferences.getString("user", ""));
-            startActivity(intent);
         }
     };
 
     private void getNewToken() {
+        SharedPreferences sharedPreferences = getEncryptedSharedPreferences(WelcomeActivity.this);
+        HttpsManager.setAccessToken(sharedPreferences.getString("AccessToken", ""));
+        HttpsManager.setRefreshToken(sharedPreferences.getString("RefreshToken", ""));
+
         GetRequest getRequest = HttpsManager.getRetrofit().create(GetRequest.class);
         Call<RspModel<String>> resp = getRequest.refresh(HttpsManager.getRefreshToken());
         resp.enqueue(new MyCallback<String>() {
@@ -89,6 +84,10 @@ public class WelcomeActivity extends AppCompatActivity {
                 if (token != null) {
                     HttpsManager.setAccessToken("Bearer " + token);
                     Log.d("getNewToken-1", "AccessToken: " + HttpsManager.getAccessToken());
+                    //获取token后跳转到下一个Activity
+                    Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+                    intent.putExtra("user", sharedPreferences.getString("user", ""));
+                    startActivity(intent);
                 } else {
                     Log.d("getNewToken-2", innerRespStatus.getMsg());
                 }
@@ -96,10 +95,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
             @Override
             protected void failed(RespStatus respStatus, Call<RspModel<String>> call) {
-                if (respStatus.getCode() == 401 && respStatus.getStatus() == 2) {
-                    Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
-                    startActivity(intent);
-                }
+                Intent intent = new Intent(WelcomeActivity.this, SignInActivity.class);
+                startActivity(intent);
                 Log.d("getNewToken-3", respStatus.getMsg());
             }
         });

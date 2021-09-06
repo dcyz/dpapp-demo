@@ -9,9 +9,10 @@
     tools:ignore="SpeakableTextPresentCheck">
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -21,12 +22,10 @@
             android:gravity="center_vertical"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/Widget.AppCompat.Light.ActionBar"
-            app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@mipmap/toolbar_menu_foreground"
             app:title="DP-App"
             app:titleTextColor="#FFFFFF" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/activity_main_nav"
