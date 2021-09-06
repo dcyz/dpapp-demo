@@ -15,6 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_mine_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Dpapp">
+
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="d2670c9b806c57d82f8870cf275f883d" />
+
         <activity
             android:name=".SettingsActivity"
             android:exported="true" />
