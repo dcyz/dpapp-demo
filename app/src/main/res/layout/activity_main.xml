@@ -9,46 +9,70 @@
     tools:ignore="SpeakableTextPresentCheck">
 
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:gravity="center_vertical"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/Widget.AppCompat.Light.ActionBar"
-            app:navigationIcon="@mipmap/toolbar_menu_foreground"
-            app:title="DP-App"
-            app:titleTextColor="#FFFFFF" />
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="50dp"
+            android:clickable="true"
+            android:contentDescription="SEND"
+            android:onClick="onClickSend"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/send_icon" />
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.amap.api.maps.MapView
-                android:id="@+id/mapView"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:gravity="center_vertical"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="@style/Widget.AppCompat.Light.ActionBar"
+                app:navigationIcon="@mipmap/toolbar_menu_foreground"
+                app:title="DP-App"
+                app:titleTextColor="#FFFFFF" />
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <ListView
-                    android:id="@+id/poiList"
+                <com.amap.api.maps.MapView
+                    android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+                    android:layout_height="match_parent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:orientation="vertical">
+
+                    <ListView
+                        android:id="@+id/poiList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    </ListView>
+                </LinearLayout>
 
 
-        </FrameLayout>
-    </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/activity_main_nav"

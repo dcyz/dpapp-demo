@@ -37,7 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void onUpload(View view) {
-        PostRequest postRequest = HttpsManager.getRetrofit().create(PostRequest.class);
+        PostRequest postRequest = HttpsManager.getRetrofit(SettingsActivity.this).create(PostRequest.class);
         Call<RspModel<String>> resp = postRequest.upload("Kacsas", HttpsManager.getAccessToken());
         resp.enqueue(new MyCallback<String>() {
             @Override

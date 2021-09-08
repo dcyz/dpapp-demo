@@ -1,12 +1,16 @@
 package dcyz.dpapp;
 
+import static com.amap.api.maps.AMapOptions.ZOOM_POSITION_RIGHT_CENTER;
 import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
+import static dcyz.dpapp.ActivityUtils.isInArea;
+import static dcyz.dpapp.ActivityUtils.setTokenHandler;
 
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,11 +29,12 @@ import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.amap.api.maps.AMap;
-import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
@@ -43,17 +48,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import models.RspModel;
+import models.structs.Query;
+import models.structs.RespStatus;
+import network.HttpsManager;
+import network.MyCallback;
+import rappor.Rappor;
+import retrofit2.Call;
+import services.GetRequest;
+
 public class MainActivity extends AppCompatActivity implements Inputtips.InputtipsListener {
 
     private DrawerLayout mDrawerLayout;
-    private ActivityUtils.MyReceiver receiver;
-    private SearchView mSearchView;
-    private ArrayList<Map<String, String>> resultList = new ArrayList<>();
+    private final ArrayList<Map<String, String>> resultList = new ArrayList<>();
     private SimpleAdapter resultAdapter;
     private MapView mMapView;
-    private Handler mHandler = new Handler();
-    private ListView resultListView;
+    private final Handler mHandler = new Handler();
     private AMap aMap = null;
+    private BitmapDescriptor bitmapDescriptor;
+    private Rappor rappor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         sendBroadcast(intent2);
 
         // 接收器，在跳转到下一个activity后接受广播信息，关闭此activity
-        receiver = new ActivityUtils.MyReceiver();
+        ActivityUtils.MyReceiver receiver = new ActivityUtils.MyReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.intent.action.CLOSE_MAIN");
         filter.addAction("android.intent.action.CLOSE_ALL");
@@ -78,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         setDrawLayout();
         setListView();
         setMapView(savedInstanceState);
+        setTokenHandler(MainActivity.this);
     }
 
     private void setDrawLayout() {
@@ -92,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
     }
 
     private void setListView() {
-        resultListView = (ListView) findViewById(R.id.poiList);
+        ListView resultListView = (ListView) findViewById(R.id.poiList);
         resultAdapter = new SimpleAdapter(
                 MainActivity.this,
                 resultList,
@@ -116,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
                                     .position(latLng)
                                     .title(hashMap.get("name"))
                                     .snippet(hashMap.get("desc"))
+                                    .icon(bitmapDescriptor)
                     );
                     marker.showInfoWindow();
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(lat, lng)).zoom(15).build();
@@ -138,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         UiSettings mUiSettings;//定义一个UiSettings对象
         mUiSettings = aMap.getUiSettings();//实例化UiSettings类对象
         mUiSettings.setScaleControlsEnabled(true);
+        mUiSettings.setZoomPosition(ZOOM_POSITION_RIGHT_CENTER);
+
+        bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
     }
 
     @Override
@@ -170,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
 
         getMenuInflater().inflate(R.menu.menu_main_search, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(item);
+        SearchView mSearchView = (SearchView) MenuItemCompat.getActionView(item);
         mSearchView.setQueryHint("输入查询地点");
 //        mSearchView.setSubmitButtonEnabled(true);
 //        mSearchView.setIconifiedByDefault(false);
@@ -249,4 +267,47 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         mMapView.onSaveInstanceState(outState);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void onClickSend(View view) {
+        GetRequest getRequest = HttpsManager.getRetrofit(MainActivity.this).create(GetRequest.class);
+        Call<RspModel<Query>> resp = getRequest.query(HttpsManager.getAccessToken());
+        resp.enqueue(new MyCallback<Query>() {
+            @Override
+            protected void success(RespStatus respStatus, Query query) {
+                ArrayList<ArrayList<Double>> areas = query.getAreas();
+                HashMap<String, Double> args = query.getArgs();
+                int scale = query.getScale();
+                int bitLen = areas.size() * scale;
+
+                rappor = new Rappor(bitLen);
+                Double f = args.get("f"), p = args.get("p"), q = args.get("q");
+                if (f != null && p != null && q != null) {
+                    Rappor.setParams(f, p, q);
+                }
+
+                for (int i = 0; i < areas.size(); i++) {
+                    LatLng latLng = new LatLng(areas.get(i).get(1), areas.get(i).get(0));
+                    Marker marker = aMap.addMarker(
+                            new MarkerOptions()
+                                    .position(latLng)
+                                    .title(String.valueOf(i))
+                                    .icon(bitmapDescriptor)
+                    );
+                    marker.showInfoWindow();
+                }
+            }
+
+            @Override
+            protected void failed(RespStatus respStatus, Call<RspModel<Query>> call) {
+
+            }
+        });
+    }
 }
