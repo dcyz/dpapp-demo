@@ -70,7 +70,7 @@ public class SignInActivity extends AppCompatActivity {
             return;
         }
         // 通过Retrofit构建请求
-        PostRequest postRequest = HttpsManager.getRetrofit().create(PostRequest.class);
+        PostRequest postRequest = HttpsManager.getRetrofit(SignInActivity.this).create(PostRequest.class);
         Call<RspModel<Token>> resp = postRequest.signUp(new User(user, passwd));
         resp.enqueue(new MyCallback<Token>() {
             @Override
@@ -122,7 +122,7 @@ public class SignInActivity extends AppCompatActivity {
             return;
         }
         // 通过Retrofit构建请求
-        PostRequest postRequest = HttpsManager.getRetrofit().create(PostRequest.class);
+        PostRequest postRequest = HttpsManager.getRetrofit(SignInActivity.this).create(PostRequest.class);
         Call<RspModel<Token>> resp = postRequest.signIn(new User(user, passwd));
         resp.enqueue(new MyCallback<Token>() {
             @Override

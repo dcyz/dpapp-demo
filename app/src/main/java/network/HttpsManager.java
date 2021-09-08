@@ -34,7 +34,10 @@ public class HttpsManager {
         HttpsManager.refreshToken = refreshToken;
     }
 
-    public static Retrofit getRetrofit() {
+    public static Retrofit getRetrofit(Context context) {
+        if (retrofit == null) {
+            retrofitInitialize(context);
+        }
         return retrofit;
     }
 

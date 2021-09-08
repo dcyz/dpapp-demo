@@ -76,7 +76,7 @@ public class WelcomeActivity extends AppCompatActivity {
         HttpsManager.setAccessToken(sharedPreferences.getString("AccessToken", ""));
         HttpsManager.setRefreshToken(sharedPreferences.getString("RefreshToken", ""));
 
-        GetRequest getRequest = HttpsManager.getRetrofit().create(GetRequest.class);
+        GetRequest getRequest = HttpsManager.getRetrofit(WelcomeActivity.this).create(GetRequest.class);
         Call<RspModel<String>> resp = getRequest.refresh(HttpsManager.getRefreshToken());
         resp.enqueue(new MyCallback<String>() {
             @Override
