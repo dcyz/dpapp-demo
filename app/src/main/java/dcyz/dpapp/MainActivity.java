@@ -1,9 +1,8 @@
 package dcyz.dpapp;
 
 import static com.amap.api.maps.AMapOptions.ZOOM_POSITION_RIGHT_CENTER;
-import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
-import static dcyz.dpapp.ActivityUtils.isInArea;
-import static dcyz.dpapp.ActivityUtils.setTokenHandler;
+import static util.ActivityUtils.getEncryptedSharedPreferences;
+import static util.ActivityUtils.setTokenHandler;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -56,6 +55,7 @@ import network.MyCallback;
 import rappor.Rappor;
 import retrofit2.Call;
 import services.GetRequest;
+import util.ActivityUtils;
 
 public class MainActivity extends AppCompatActivity implements Inputtips.InputtipsListener {
 

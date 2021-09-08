@@ -1,7 +1,6 @@
 package dcyz.dpapp;
 
-import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
-import static dcyz.dpapp.ActivityUtils.setTokenHandler;
+import static util.ActivityUtils.getEncryptedSharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,15 +17,14 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import models.RspModel;
 import models.structs.RespStatus;
 import network.HttpsManager;
 import network.MyCallback;
 import retrofit2.Call;
-import retrofit2.Retrofit;
 import services.GetRequest;
+import util.ActivityUtils;
 
 public class WelcomeActivity extends AppCompatActivity {
 

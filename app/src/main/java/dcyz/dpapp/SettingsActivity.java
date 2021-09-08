@@ -1,6 +1,6 @@
 package dcyz.dpapp;
 
-import static dcyz.dpapp.ActivityUtils.setTokenHandler;
+import static util.ActivityUtils.setTokenHandler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +16,7 @@ import network.HttpsManager;
 import network.MyCallback;
 import retrofit2.Call;
 import services.PostRequest;
+import util.ActivityUtils;
 
 public class SettingsActivity extends AppCompatActivity {
 

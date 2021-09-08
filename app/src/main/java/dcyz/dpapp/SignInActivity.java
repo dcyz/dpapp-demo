@@ -1,7 +1,7 @@
 package dcyz.dpapp;
 
-import static dcyz.dpapp.ActivityUtils.getEncryptedSharedPreferences;
-import static dcyz.dpapp.ActivityUtils.setDialog;
+import static util.ActivityUtils.getEncryptedSharedPreferences;
+import static util.ActivityUtils.setDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,6 +21,7 @@ import network.HttpsManager;
 import network.MyCallback;
 import retrofit2.Call;
 import services.PostRequest;
+import util.ActivityUtils;
 
 public class SignInActivity extends AppCompatActivity {
 
