@@ -3,6 +3,7 @@ package services;
 import models.RspModel;
 import models.structs.Token;
 import models.structs.User;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.HTTP;
@@ -56,7 +57,7 @@ public interface PostRequest {
     })
     @HTTP(method = "POST", path = "/user/upload", hasBody = true)
     Call<RspModel<String>> upload(
-            @Body String data,
+            @Body RequestBody bytes,
             @Header("Authorization") String accessToken
     );
 }

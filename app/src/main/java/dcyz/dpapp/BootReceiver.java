@@ -8,9 +8,10 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //标准的写法是需要判别Action的类型的
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)){
-            //你想执行的操作
-        }
+        // TODO BootReceiver用于开机自启动服务，如需开启则取消BootReceiver和Manifest的注释
+//        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+//            Intent serviceIntent = new Intent(context, QueryService.class);
+//            context.startService(serviceIntent);
+//        }
     }
 }

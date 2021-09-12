@@ -17,15 +17,16 @@ public class BitOps {
         return !(bt == 0);
     }
 
-    public static String[] bytesToBinaryString(byte[] data) {
-        String[] str = new String[data.length];
+    public static String bytesToBinaryString(byte[] data) {
+        StringBuilder result = new StringBuilder(), tmp;
         for (int i = 0; i < data.length; i++) {
-            str[i] = Integer.toBinaryString((int) data[i] & 0xff);
-            int len = str[i].length();
+            tmp = new StringBuilder(Integer.toBinaryString((int) data[i] & 0xff));
+            int len = tmp.length();
             for (int j = 0; j < 8 - len; j++) {
-                str[i] = "0" + str[i];
+                tmp.insert(0, "0");
             }
+            result.append(tmp);
         }
-        return str;
+        return result.toString();
     }
 }

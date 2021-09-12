@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Random;
 
 public class Rappor {
-    private static double F = 0.5, P = 0.75, Q = 0.75;
+    private double F = 0.5, P = 0.75, Q = 0.75;
     private byte[] data = null;
     private Random rand = null;
     private int bitLen;
@@ -14,6 +14,7 @@ public class Rappor {
         rand.setSeed(new Date().getTime());
         int bytelen = (int) (Math.ceil(1.0 * bitLen / 8));
         data = new byte[bytelen];
+        this.bitLen = bitLen;
     }
 
     public void setBit(int loc) {
@@ -41,19 +42,20 @@ public class Rappor {
                 }
             }
         }
+
     }
 
-    public static void setParams(double f, double p, double q) {
-        Rappor.F = f;
-        Rappor.P = p;
-        Rappor.Q = q;
+    public void setParams(double f, double p, double q) {
+        this.F = f;
+        this.P = p;
+        this.Q = q;
     }
 
     public byte[] getData() {
         return this.data;
     }
 
-    public String[] getDataBinaryString() {
+    public String getDataBinaryString() {
         return BitOps.bytesToBinaryString(this.data);
     }
 }

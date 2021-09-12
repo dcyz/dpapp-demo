@@ -2,13 +2,18 @@ package dcyz.dpapp;
 
 import static com.amap.api.maps.AMapOptions.ZOOM_POSITION_RIGHT_CENTER;
 import static util.ActivityUtils.getEncryptedSharedPreferences;
-import static util.ActivityUtils.setTokenHandler;
+import static util.ActivityUtils.setDialog;
+import static util.LocationUtils.checkLocationPermission;
+import static util.LocationUtils.getLocationPermission;
 
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -50,6 +56,7 @@ import java.util.Map;
 import models.RspModel;
 import models.structs.Query;
 import models.structs.RespStatus;
+import models.structs.Token;
 import network.HttpsManager;
 import network.MyCallback;
 import rappor.Rappor;
@@ -68,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
     private BitmapDescriptor bitmapDescriptor;
     private Rappor rappor;
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +99,36 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         setDrawLayout();
         setListView();
         setMapView(savedInstanceState);
-        setTokenHandler(MainActivity.this);
+
+        Intent tokenService = new Intent(MainActivity.this, TokenService.class);
+        startService(tokenService);
+
+        if (!checkLocationPermission(this)) {
+            setDialog(this, "位置权限", "应用程序需要位置权限以提供服务");
+            getLocationPermission(this);
+        } else {
+            Intent serviceIntent = new Intent(MainActivity.this, QueryService.class);
+            startService(serviceIntent);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 100) {
+            ArrayList<String> failed = new ArrayList<>();
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    failed.add(permissions[i]);
+                }
+            }
+            if (failed.size() == 0) {
+                Intent serviceIntent = new Intent(MainActivity.this, QueryService.class);
+                startService(serviceIntent);
+            } else {
+                getLocationPermission(this);
+            }
+        }
     }
 
     private void setDrawLayout() {
@@ -241,13 +278,19 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
 
     @Override
     protected void onDestroy() {
+        Log.d("MainActivity", "onDestroy");
         super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
+        Intent tokenService = new Intent(MainActivity.this, TokenService.class);
+        stopService(tokenService);
+        Intent queryService = new Intent(MainActivity.this, QueryService.class);
+        stopService(queryService);
     }
 
     @Override
     protected void onResume() {
+        Log.d("MainActivity", "onResume");
         super.onResume();
         //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
         mMapView.onResume();
@@ -255,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
 
     @Override
     protected void onPause() {
+        Log.d("MainActivity", "onPause");
         super.onPause();
         //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         mMapView.onPause();
@@ -267,47 +311,14 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         mMapView.onSaveInstanceState(outState);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(true);
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    public void onClickSend(View view) {
-        GetRequest getRequest = HttpsManager.getRetrofit(MainActivity.this).create(GetRequest.class);
-        Call<RspModel<Query>> resp = getRequest.query(HttpsManager.getAccessToken());
-        resp.enqueue(new MyCallback<Query>() {
-            @Override
-            protected void success(RespStatus respStatus, Query query) {
-                ArrayList<ArrayList<Double>> areas = query.getAreas();
-                HashMap<String, Double> args = query.getArgs();
-                int scale = query.getScale();
-                int bitLen = areas.size() * scale;
-
-                rappor = new Rappor(bitLen);
-                Double f = args.get("f"), p = args.get("p"), q = args.get("q");
-                if (f != null && p != null && q != null) {
-                    Rappor.setParams(f, p, q);
-                }
-
-                for (int i = 0; i < areas.size(); i++) {
-                    LatLng latLng = new LatLng(areas.get(i).get(1), areas.get(i).get(0));
-                    Marker marker = aMap.addMarker(
-                            new MarkerOptions()
-                                    .position(latLng)
-                                    .title(String.valueOf(i))
-                                    .icon(bitmapDescriptor)
-                    );
-                    marker.showInfoWindow();
-                }
-            }
-
-            @Override
-            protected void failed(RespStatus respStatus, Call<RspModel<Query>> call) {
-
-            }
-        });
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            moveTaskToBack(true);
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
+    
+    public void onClickSearch(View view) {
     }
 }

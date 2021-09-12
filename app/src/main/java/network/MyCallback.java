@@ -63,6 +63,7 @@ public abstract class MyCallback<T> implements Callback<RspModel<T>> {
                     respStatus.setStatus(1);
                     respStatus.setMsg("NoRspModel");
                 }
+                Log.d("MyCallback-4", respStatus.getMsg());
             } else {
                 respStatus.setStatus(2);
                 respStatus.setMsg("NoErrorBody");
