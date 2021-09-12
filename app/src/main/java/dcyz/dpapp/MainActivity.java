@@ -2,14 +2,17 @@ package dcyz.dpapp;
 
 import static com.amap.api.maps.AMapOptions.ZOOM_POSITION_RIGHT_CENTER;
 import static util.ActivityUtils.getEncryptedSharedPreferences;
+import static util.ActivityUtils.getGradientColor;
 import static util.ActivityUtils.setDialog;
 import static util.LocationUtils.checkLocationPermission;
 import static util.LocationUtils.getLocationPermission;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,19 +44,26 @@ import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.Gradient;
+import com.amap.api.maps.model.HeatmapTileProvider;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.PolygonOptions;
+import com.amap.api.maps.model.TileOverlayOptions;
+import com.amap.api.maps.model.WeightedLatLng;
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import models.RspModel;
+import models.structs.AreaStat;
 import models.structs.Query;
 import models.structs.RespStatus;
 import models.structs.Token;
@@ -73,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
     private final Handler mHandler = new Handler();
     private AMap aMap = null;
     private BitmapDescriptor bitmapDescriptor;
-    private Rappor rappor;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -318,7 +327,46 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
 //        }
 //        return super.onKeyDown(keyCode, event);
 //    }
-    
+
     public void onClickSearch(View view) {
+        Context context = ActivityUtils.getContext();
+        GetRequest getRequest = HttpsManager.getRetrofit(context).create(GetRequest.class);
+        Call<RspModel<ArrayList<AreaStat>>> resp = getRequest.search(HttpsManager.getAccessToken());
+        resp.enqueue(new MyCallback<ArrayList<AreaStat>>() {
+            @Override
+            protected void success(RespStatus respStatus, ArrayList<AreaStat> stats) {
+                aMap.clear();
+                int max = 0;
+                for (AreaStat stat : stats) {
+                    if (stat.getCount() > max) {
+                        max = stat.getCount();
+                    }
+                }
+                for (AreaStat stat : stats) {
+                    aMap.addPolygon(
+                            new PolygonOptions().addAll(getSquareArea(stat.getLng(), stat.getLat(), stat.getWidth()))
+                                    .fillColor(getGradientColor(stat.getCount() * 1.0 / max, 0.5f))
+                                    .strokeColor(Color.argb(0, 0, 0, 0))
+                                    .strokeWidth(0)
+                    );
+                }
+
+            }
+
+            @Override
+            protected void failed(RespStatus respStatus, Call<RspModel<ArrayList<AreaStat>>> call) {
+                Toast.makeText(MainActivity.this, respStatus.getMsg(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    private ArrayList<LatLng> getSquareArea(double lng, double lat, double width) {
+        ArrayList<LatLng> points = new ArrayList<>();
+        points.add(new LatLng(lat - width / 2, lng - width / 2));
+        points.add(new LatLng(lat + width / 2, lng - width / 2));
+        points.add(new LatLng(lat + width / 2, lng + width / 2));
+        points.add(new LatLng(lat - width / 2, lng + width / 2));
+        return points;
+    }
+
 }

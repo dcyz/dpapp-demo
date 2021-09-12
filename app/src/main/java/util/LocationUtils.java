@@ -94,7 +94,7 @@ public class LocationUtils {
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location != null) {
-            Toast.makeText(context, "[ " + location.getLatitude() + ", " + location.getLongitude() + " ]", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "[ " + location.getLatitude() + ", " + location.getLongitude() + " ]", Toast.LENGTH_SHORT).show();
             return new LatLng(location.getLatitude(), location.getLongitude());
         } else {
             Toast.makeText(context, "获取位置失败", Toast.LENGTH_SHORT).show();

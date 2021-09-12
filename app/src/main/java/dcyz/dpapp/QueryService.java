@@ -124,7 +124,8 @@ public class QueryService extends Service {
         resp.enqueue(new MyCallback<String>() {
             @Override
             protected void success(RespStatus respStatus, String query) {
-                Toast.makeText(QueryService.this, "上传成功", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QueryService.this, "上传成功", Toast.LENGTH_SHORT).show();
+                Log.d("QUeryService", "上传成功");
             }
 
             @Override

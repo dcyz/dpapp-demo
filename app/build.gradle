@@ -54,4 +54,7 @@ dependencies {
     implementation 'com.amap.api:location:latest.integration'
     //搜索功能
     implementation 'com.amap.api:search:latest.integration'
+
+    //noinspection GradleCompatible
+    implementation 'com.android.support:support-v4:25.1.1'
 }

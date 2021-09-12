@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 import models.RspModel;
+import models.structs.AreaStat;
 import models.structs.Query;
 import retrofit2.Call;
 import retrofit2.http.HTTP;
@@ -36,6 +37,20 @@ public interface GetRequest {
     })
     @HTTP(method = "GET", path = "/user/query")
     Call<RspModel<Query>> query(
+            @Header("Authorization") String accessToken
+    );
+
+    /**
+     * 获取统计结果
+     *
+     * @return Types.Result的Call
+     */
+    @Headers({
+            "Content-Type: application/json",
+            "User-Agent: dpapp"
+    })
+    @HTTP(method = "GET", path = "/user/search")
+    Call<RspModel<ArrayList<AreaStat>>> search(
             @Header("Authorization") String accessToken
     );
 }

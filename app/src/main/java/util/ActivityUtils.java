@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
 
@@ -74,6 +75,18 @@ public class ActivityUtils extends Application {
         @Override
         public void onReceive(Context context, Intent intent) {
             ((Activity) context).finish();
+        }
+    }
+
+    public static int getGradientColor(double weight, float alpha) {
+        if (weight < 0.25) {
+            return Color.argb(alpha, 0, (float) (weight * 4), 1);
+        } else if (weight < 0.5) {
+            return Color.argb(alpha, 0, 1, (float) ((0.5 - weight) * 4));
+        } else if (weight < 0.75) {
+            return Color.argb(alpha, (float) ((weight - 0.5) * 4), 1, 0);
+        } else {
+            return Color.argb(alpha, 1, (float) ((1 - weight) * 4), 0);
         }
     }
 
