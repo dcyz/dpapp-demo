@@ -1,5 +1,6 @@
 package util;
 
+import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 import static util.ActivityUtils.setDialog;
@@ -21,6 +22,8 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import com.amap.api.maps.model.LatLng;
+
+import java.util.List;
 
 public class LocationUtils {
     private static LocationManager locationManager;
@@ -58,7 +61,7 @@ public class LocationUtils {
     @SuppressLint("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static void setLocationService(Context context) {
-        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             return;
         }
@@ -92,13 +95,19 @@ public class LocationUtils {
         if (locationManager == null) {
             setLocationService(context);
         }
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location != null) {
-            //Toast.makeText(context, "[ " + location.getLatitude() + ", " + location.getLongitude() + " ]", Toast.LENGTH_SHORT).show();
-            return new LatLng(location.getLatitude(), location.getLongitude());
-        } else {
-            Toast.makeText(context, "获取位置失败", Toast.LENGTH_SHORT).show();
-            return null;
+        List<String> providers = locationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = locationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
         }
+        assert bestLocation != null;
+        return new LatLng(bestLocation.getLatitude(),bestLocation.getLongitude());
     }
 }

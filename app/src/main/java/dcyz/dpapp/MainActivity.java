@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
                 }
                 for (AreaStat stat : stats) {
                     aMap.addPolygon(
-                            new PolygonOptions().addAll(getSquareArea(stat.getLng(), stat.getLat(), stat.getWidth()))
+                            new PolygonOptions().addAll(getSquareArea(stat))
                                     .fillColor(getGradientColor(stat.getCount() * 1.0 / max, 0.5f))
                                     .strokeColor(Color.argb(0, 0, 0, 0))
                                     .strokeWidth(0)
@@ -360,12 +360,12 @@ public class MainActivity extends AppCompatActivity implements Inputtips.Inputti
         });
     }
 
-    private ArrayList<LatLng> getSquareArea(double lng, double lat, double width) {
+    private ArrayList<LatLng> getSquareArea(AreaStat areaStat) {
         ArrayList<LatLng> points = new ArrayList<>();
-        points.add(new LatLng(lat - width / 2, lng - width / 2));
-        points.add(new LatLng(lat + width / 2, lng - width / 2));
-        points.add(new LatLng(lat + width / 2, lng + width / 2));
-        points.add(new LatLng(lat - width / 2, lng + width / 2));
+        points.add(new LatLng(areaStat.getStartLat(), areaStat.getStartLng()));
+        points.add(new LatLng(areaStat.getEndLat(), areaStat.getStartLng()));
+        points.add(new LatLng(areaStat.getEndLat(), areaStat.getEndLng()));
+        points.add(new LatLng(areaStat.getStartLat(), areaStat.getEndLng()));
         return points;
     }
 
